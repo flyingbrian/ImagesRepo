@@ -1,12 +1,13 @@
-
 const MAX_VELOCITY_X = 8
 const MAX_VELOCITY_Y = 8
 var app;
 var sprite;
 var velocity = { x : 0, y : 0 };
-var speed = 10;
+var speed = 3;
 var friction = 0.95;
 var timeStep;
+
+var weapon;
 
 function Hero(app)
 {
@@ -23,16 +24,21 @@ function Hero(app)
 	})
 
 	app.stage.addChild(sprite);
+
+	weapon = new Weapon();
+	weapon.init(app);
+	setWeapon(weaponTypes.singleShot);
 }
 
 function update(delta)
 {
-	updateInput(delta);
+	timeStep = delta;
+	updateInput();
+	weapon.updateWeapon();
 
 	this.sprite.position.x += velocity.x; 
 	this.sprite.position.y += velocity.y; 
-	
-	
+		
 	var dir = { x : 0, y : 0};
 
 	if(this.sprite.position.x - this.sprite.width / 2 < 0)
@@ -62,15 +68,14 @@ function update(delta)
 
 	velocity.x = (velocity.x > MAX_VELOCITY_X) ? MAX_VELOCITY_X : velocity.x;
 	velocity.y = (velocity.y > MAX_VELOCITY_Y) ? MAX_VELOCITY_Y : velocity.y;
-
-
+	
 	velocity.x *= 0.95;
 	velocity.y *= 0.95;
 }
 
-function updateInput(delta)
+function updateInput()
 {
-	timeStep = delta;
+	
 	if(leftPressed)
 	{
 		turnHero(-0.1);//turn left
@@ -88,6 +93,11 @@ function updateInput(delta)
 	{
 		ApplyForceForward(-0.1);
 	}
+
+	if(spaceBarPressed)
+	{
+		fireBullet();
+	}
 }
 
 function ApplyForceForward(direction)
@@ -104,7 +114,7 @@ function ApplyForceForward(direction)
 
 function ApplyBounceOffImpulse(direction)
 {
-	var impulseForce = { x :MAX_VELOCITY_X* 0.2, y : MAX_VELOCITY_Y * 0.2 };
+	var impulseForce = { x :MAX_VELOCITY_X * 0.2, y : MAX_VELOCITY_Y * 0.2 };
 
 
 	velocity.x += direction.x * 10 * timeStep * impulseForce.x;
@@ -115,3 +125,14 @@ function turnHero(turn)
 {
 	this.sprite.rotation += turn;
 }
+
+function fireBullet()
+{
+	if(!weapon.readyToFire()) return;
+	
+	var rotInDegrees = this.sprite.rotation - (90 * (Math.PI/180));
+	var projectilePos = { x : this.sprite.x, y : this.sprite.y };
+	
+	weapon.fireProjectile(rotInDegrees, projectilePos, velocity);
+}
+

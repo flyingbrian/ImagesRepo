@@ -24,11 +24,25 @@ document.addEventListener('keydown', function(event)
 		downPressed = true;
 	}
 
-
 	if(event.keyCode == 32)
 	{
 		spaceBarPressed = true;
 	}
+
+	if(event.keyCode == 78)   //N
+	{
+		setWeapon(weaponTypes.singleShot)
+	}
+	if(event.keyCode == 68)
+	{
+		setWeapon(weaponTypes.doubleShot)	
+	}
+	if(event.keyCode == 83)   //S
+	{
+		setWeapon(weaponTypes.spreadShot)
+	}
+
+
 })
 
 

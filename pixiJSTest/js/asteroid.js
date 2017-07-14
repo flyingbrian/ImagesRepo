@@ -11,13 +11,13 @@ const ASTEROID_LG_HEALTH = 30;
 
 function Asteroid(app, size, sprite)
 {
+	var app = app;;
 	var health;
 	var velocity = { x : 0, y : 0 };
 	var rotationSpeed = 10;
 	var sprite = sprite;
 	
 	var scaleTimer = 0;
-	this.maxScale = 0;
 	this.isActive = false;
 
 	if(size == asteroidSize.small) { health = ASTEROID_SM_HEALTH; }
@@ -28,24 +28,23 @@ function Asteroid(app, size, sprite)
 	sprite.renderable = false;
 	
 	//method is called by a ticker added when activateMe is called
-	this.updateMe = function(){
-		sprite.rotation += rotationSpeed * timeStep / 40;
+	var updateMe = function(){
+		sprite.rotation += rotationSpeed * timeStep / 1000;
 		sprite.x += velocity.x * timeStep;
 		sprite.y += velocity.y * timeStep;
 		
 	};
 	
-	this.scaleMe = function(){
+	var scaleMe = function(){
 		scaleTimer += timeStep / 40;
 		
 		var scaleLerpValue = lerp(0, 1, scaleTimer);
-		console.log(scaleTimer);
 		
 		sprite.scale.x = scaleLerpValue;
 		sprite.scale.y = scaleLerpValue;
 		
 		if(scaleTimer > 1){
-			app.ticker.remove(this.scaleMe);
+			app.ticker.remove(scaleMe);
 		}
 	}
 
@@ -65,7 +64,7 @@ function Asteroid(app, size, sprite)
 		var maxX = app.renderer.width - sprite.width / 2;
 
 		var minY = sprite.height / 2;
-		var maxY = app.renderer.width - sprite.width / 2;
+		var maxY = app.renderer.height - sprite.height / 2;
 
 		var randomX = Math.floor(minX  + Math.random() * maxX);
 		var randomY = Math.floor(minY  + Math.random() * maxY);
@@ -81,13 +80,7 @@ function Asteroid(app, size, sprite)
 		sprite.scale.x = 0;
 		sprite.scale.y = 0;
 
-		
-		this.maxScale = maxScaleValue;
-
-		app.ticker.add(this.updateMe);
-		app.ticker.add(this.scaleMe);
+		app.ticker.add(updateMe);
+		app.ticker.add(scaleMe);
 	};
 }
-
-
-

@@ -6,8 +6,10 @@ function AsteroidSpawner(app)
 	var mediumAsteroids = [];
 	var largeAsteroids = [];
 
+	var listOfAsteroids = [];
 	var app = app;
 
+	var numOfObjectPool = 25;
 	var numOfSmalls = 25;
 	var numOfMediums = 10;
 	var numOfLarges = 5;
@@ -20,39 +22,29 @@ function AsteroidSpawner(app)
 	initAsteroids();
 
 	function initAsteroids()
-	{		
-		//SMALLS
-		for(var i = 0; i < numOfSmalls; i++)
+	{				
+		for(var i =0; i < numOfObjectPool; i++)
 		{
-
-			var indexToString = (i % 2 == 1) ? "1" : "2";
-			
-			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/AsteroidSM" + indexToString + ".png");
-			smallAsteroids[i] = new Asteroid(app, asteroidSize.small, sprite);
-
-			if(indexToString == "2") 
-			{
-				smallAsteroids[i].maxScale = 0.25;
-			}
-			else
-			{
-				smallAsteroids[i].maxScale = 1;
-			}
-		}
-		//MEDIUMS
-		for(var i = 0; i < numOfMediums; i++)
-		{
-			var indexToString = (i % 2 == 1) ? "1" : "2";
-			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/AsteroidMD" + indexToString + ".png");
-			mediumAsteroids[i] = new Asteroid(app, asteroidSize.medium, sprite);
+			var randomNum = Math.floor(Math.random() * 5);
+			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/Asteroid" + randomNum +".png");
+			listOfAsteroids[i] = new Asteroid(app, asteroidSize.small, sprite);	
 		}
 		
-		for(var i = 0; i < numOfLarges; i++)
-		{
-			var indexToString = (i % 2 == 1) ? "1" : "2";
-			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/AsteroidLG" + indexToString + ".png");
-			largeAsteroids[i] = new Asteroid(app, asteroidSize.large, sprite);
-		}			
+		//SMALLS
+		// for(var i = 0; i < numOfSmalls; i++)
+		// {
+		// 	smallAsteroids[i] = new Asteroid(app, asteroidSize.small, sprite);
+		// }
+		// //MEDIUMS
+		// for(var i = 0; i < numOfMediums; i++)
+		// {
+		// 	mediumAsteroids[i] = new Asteroid(app, asteroidSize.medium, sprite);
+		// }
+		
+		// for(var i = 0; i < numOfLarges; i++)
+		// {			
+		// 	largeAsteroids[i] = new Asteroid(app, asteroidSize.large, sprite);
+		// }			
 	}
 
 	var updateSpawnCheck = function()
@@ -62,8 +54,8 @@ function AsteroidSpawner(app)
 		{
 			spawnTimer = 0;
 
-			var nextItemToSpawn = getFirstInactiveAsteroid(asteroidSize.small);
-			nextItemToSpawn.activateMe(nextItemToSpawn.maxScale);
+			var nextItemToSpawn = getFirstInactiveAsteroid();
+			nextItemToSpawn.activateMe();
 		}
 
 	}
@@ -73,24 +65,31 @@ function AsteroidSpawner(app)
 
 	function getFirstInactiveAsteroid(size)
 	{
-		switch (size) {
-			case asteroidSize.small:
-
-				for (var i = 0; i < numOfSmalls; i++) 
-				{
-					if(smallAsteroids[i].isActive == false)
-					{
-						return smallAsteroids[i];
-					}
-				}		
-				break;
-			case asteroidSize.medium:
-				
-				break;
-			case asteroidSize.large:
-				
-				break;
+		for(var i = 0; i < listOfAsteroids.length; i++)
+		{
+			if(listOfAsteroids[i].isActive == false)
+			{
+				return listOfAsteroids[i];
+			}
 		}
+		// switch (size) {
+		// 	case asteroidSize.small:
+
+		// 		for (var i = 0; i < numOfSmalls; i++) 
+		// 		{
+		// 			if(smallAsteroids[i].isActive == false)
+		// 			{
+		// 				return smallAsteroids[i];
+		// 			}
+		// 		}		
+		// 		break;
+		// 	case asteroidSize.medium:
+				
+		// 		break;
+		// 	case asteroidSize.large:
+				
+		// 		break;
+		// }
 	}
 }
 

@@ -5,16 +5,89 @@ var asteroidSize =
 	large : 2,
 };
 
-function Asteroid()
-{
-	var sprite;
-	var health;
-	var boundsRadius = 5;   //for circle collission
-	var velocity = { x : 0, y : 0 };
-	var rotationSpeed;
+const ASTEROID_SM_HEALTH = 10;
+const ASTEROID_MD_HEALTH = 20;
+const ASTEROID_LG_HEALTH = 30;
 
-	this.init = function(app, size){
+function Asteroid(app, size, sprite)
+{
+	var health;
+	var velocity = { x : 0, y : 0 };
+	var rotationSpeed = 10;
+	var sprite = sprite;
+	
+	var scaleTimer = 0;
+	this.maxScale = 0;
+	this.isActive = false;
+
+	if(size == asteroidSize.small) { health = ASTEROID_SM_HEALTH; }
+	else if(size == asteroidSize.medium) { health = ASTEROID_MD_HEALTH; }
+	else if(size == asteroidSize.large) { health = ASTEROID_LG_HEALTH; }
+	
+	app.stage.addChild(sprite);
+	sprite.renderable = false;
+	
+	//method is called by a ticker added when activateMe is called
+	this.updateMe = function(){
+		sprite.rotation += rotationSpeed * timeStep / 40;
+		sprite.x += velocity.x * timeStep;
+		sprite.y += velocity.y * timeStep;
 		
+	};
+	
+	this.scaleMe = function(){
+		scaleTimer += timeStep / 40;
+		
+		var scaleLerpValue = lerp(0, 1, scaleTimer);
+		console.log(scaleTimer);
+		
+		sprite.scale.x = scaleLerpValue;
+		sprite.scale.y = scaleLerpValue;
+		
+		if(scaleTimer > 1){
+			app.ticker.remove(this.scaleMe);
+		}
 	}
 
+	this.destroyMe = function()
+	{
+		app.ticker.remove(updateMe);
+	}
+
+	this.activateMe = function(maxScaleValue)
+	{
+		this.isActive = true;
+		sprite.renderable = true;
+		sprite.anchor.set(0.5); //move origin to the center
+
+		// a number > 0 + sprite.width
+		var minX = sprite.width / 2;
+		var maxX = app.renderer.width - sprite.width / 2;
+
+		var minY = sprite.height / 2;
+		var maxY = app.renderer.width - sprite.width / 2;
+
+		var randomX = Math.floor(minX  + Math.random() * maxX);
+		var randomY = Math.floor(minY  + Math.random() * maxY);
+
+		var randomRotation = Math.floor(Math.random() * 360);
+		randomRotation *= Math.PI / 180;
+		
+		sprite.rotation = randomRotation;
+
+		sprite.x = randomX; 
+		sprite.y = randomY;
+		
+		sprite.scale.x = 0;
+		sprite.scale.y = 0;
+
+		
+		this.maxScale = maxScaleValue;
+
+		app.ticker.add(this.updateMe);
+		app.ticker.add(this.scaleMe);
+	};
 }
+
+
+

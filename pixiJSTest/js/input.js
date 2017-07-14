@@ -33,7 +33,7 @@ document.addEventListener('keydown', function(event)
 	{
 		setWeapon(weaponTypes.singleShot)
 	}
-	if(event.keyCode == 68)
+	if(event.keyCode == 68) //B
 	{
 		setWeapon(weaponTypes.doubleShot)	
 	}

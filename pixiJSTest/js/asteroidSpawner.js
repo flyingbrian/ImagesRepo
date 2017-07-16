@@ -1,25 +1,24 @@
 const SPAWN_DELAY = 4;
 
-function AsteroidSpawner(app)
-{
-	var smallAsteroids = [];
-	var mediumAsteroids = [];
-	var largeAsteroids = [];
+var listOfSpawnedAsteroids = []
+var listOfExplosionAnimations = []
 
-	var listOfAsteroids = [];
+function AsteroidSpawner(app)
+{	
 	var app = app;
 
 	var numOfObjectPool = 25;
-	var numOfSmalls = 25;
-	var numOfMediums = 10;
-	var numOfLarges = 5;
 
 	var inSpawnPhase = true;
 	var spawnTimer = 0;
 
-	
+	var numToSpawn = 15;
+	var currentlySpawned = 0;
 
+	var listOfAsteroids = [];
+	
 	initAsteroids();
+	initExplosionSprites();
 
 	function initAsteroids()
 	{				
@@ -27,24 +26,32 @@ function AsteroidSpawner(app)
 		{
 			var randomNum = Math.floor(Math.random() * 5);
 			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/Asteroid" + randomNum +".png");
-			listOfAsteroids[i] = new Asteroid(app, asteroidSize.small, sprite);	
-		}
-		
-		//SMALLS
-		// for(var i = 0; i < numOfSmalls; i++)
-		// {
-		// 	smallAsteroids[i] = new Asteroid(app, asteroidSize.small, sprite);
-		// }
-		// //MEDIUMS
-		// for(var i = 0; i < numOfMediums; i++)
-		// {
-		// 	mediumAsteroids[i] = new Asteroid(app, asteroidSize.medium, sprite);
-		// }
-		
-		// for(var i = 0; i < numOfLarges; i++)
-		// {			
-		// 	largeAsteroids[i] = new Asteroid(app, asteroidSize.large, sprite);
-		// }			
+			listOfAsteroids[i] = new Asteroid(app, sprite);	
+		}		
+		spawnAsteroid(asteroidSize.large);
+	}
+
+	function initExplosionSprites()
+	{
+		for(var i = 0; i < 10; i++)
+		{
+			var pathName = "https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/ExplosionSpriteAnimation.png";
+			
+			var spriteOBJ = new SpriteAnimation(pathName, 64, 64, 5, i) 
+			listOfExplosionAnimations.push(spriteOBJ);
+		}	
+	}
+
+	function initAsteroidsDuringRuntime()
+	{
+			var randomNum = Math.floor(Math.random() * 5);
+			var sprite = PIXI.Sprite.from("https://raw.githubusercontent.com/flyingbrian/ImagesRepo/master/resources/images/Asteroid" + randomNum +".png");
+			
+			var newAsteroid = new Asteroid(app, sprite)
+			
+			listOfAsteroids.push(newAsteroid);	
+			
+			return listOfAsteroids[listOfAsteroids.length - 1];
 	}
 
 	var updateSpawnCheck = function()
@@ -54,45 +61,66 @@ function AsteroidSpawner(app)
 		{
 			spawnTimer = 0;
 
-			var nextItemToSpawn = getFirstInactiveAsteroid();
-			nextItemToSpawn.activateMe();
+			spawnAsteroid(asteroidSize.large);
 		}
-
 	}
 
+	function spawnAsteroid(size)
+	{	
+		var nextItemToSpawn = getFirstInactiveAsteroid();
+		nextItemToSpawn.activateMe(size);
+
+		if(nextItemToSpawn.isActive == false) 
+		{
+			app.ticker.remove(updateSpawnCheck); //remove loop ticker
+			return; //checks if it was able to spawn, may fail if there is no room
+		}
+
+		listOfSpawnedAsteroids.push(nextItemToSpawn);
+		nextItemToSpawn.id = listOfSpawnedAsteroids.length - 1; 
+
+		currentlySpawned++;
+		if(currentlySpawned == numToSpawn)
+		{
+			app.ticker.remove(updateSpawnCheck); //remove loop ticker
+		}
+	}
 	//update loop init
 	app.ticker.add(updateSpawnCheck);
-
-	function getFirstInactiveAsteroid(size)
+	
+	function getFirstInactiveAsteroid()
 	{
 		for(var i = 0; i < listOfAsteroids.length; i++)
 		{
 			if(listOfAsteroids[i].isActive == false)
 			{
+
 				return listOfAsteroids[i];
 			}
-		}
-		// switch (size) {
-		// 	case asteroidSize.small:
-
-		// 		for (var i = 0; i < numOfSmalls; i++) 
-		// 		{
-		// 			if(smallAsteroids[i].isActive == false)
-		// 			{
-		// 				return smallAsteroids[i];
-		// 			}
-		// 		}		
-		// 		break;
-		// 	case asteroidSize.medium:
-				
-		// 		break;
-		// 	case asteroidSize.large:
-				
-		// 		break;
-		// }
+		}		
+		
+		return initAsteroidsDuringRuntime();
 	}
 }
 
+function spawnChildrenAsteroids(sprite, size)
+{	
+	
+/*	var nextItemToSpawn = getFirstInactiveAsteroid();
+	nextItemToSpawn.activateMe(size);
 
+	if(nextItemToSpawn.isActive == false) 
+	{
+		app.ticker.remove(updateSpawnCheck); //remove loop ticker
+		return; //checks if it was able to spawn, may fail if there is no room
+	}
 
+	listOfSpawnedAsteroids.push(nextItemToSpawn);
+	nextItemToSpawn.id = listOfSpawnedAsteroids.length - 1; 
 
+	currentlySpawned++;
+	if(currentlySpawned == numToSpawn)
+	{
+		app.ticker.remove(updateSpawnCheck); //remove loop ticker
+	}*/
+}

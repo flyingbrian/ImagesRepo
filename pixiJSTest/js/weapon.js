@@ -8,7 +8,7 @@ var weaponTypes =
 function Weapon(){	
 	var projectilePool = [];
 	var objPoolAmount = 40;
-	var fireRate = 0.5 ;
+	var fireRate = 1 ;
 	var rateTimer = 0;
 	var fireSpeed = 8;
 	var weaponType;
@@ -22,20 +22,7 @@ function Weapon(){
 	this.updateWeapon = function(){
 		rateTimer += timeStep / 10; 
 		
-		for (var i = 0; i < projectilePool.length; i++){
-			if(projectilePool[i].isActive){
-				projectilePool[i].timer += timeStep / 10;				
-				
-				projectilePool[i].sprite.position.x += projectilePool[i].velocity.x; 
-				projectilePool[i].sprite.position.y += projectilePool[i].velocity.y; 
-				
-				if(projectilePool[i].timer > projectilePool[i].lifeTimer){
-					projectilePool[i].timer = 0;
-					projectilePool[i].isActive = false;
-					projectilePool[i].sprite.renderable = false;
-				}
-			}	
-		}
+		collissionCheck();
 	}	
 
 	this.fireProjectile = function(angle, position, heroVelocity){		
@@ -95,8 +82,7 @@ function Weapon(){
 		}
 	}
 
-	setWeapon = function(typeOfWeapon)
-	{
+	setWeapon = function(typeOfWeapon)	{
 		weaponType = typeOfWeapon;
 	}
 
@@ -109,9 +95,37 @@ function Weapon(){
 		return false;
 	}
 
+	function collissionCheck(){
+		for (var i = 0; i < projectilePool.length; i++){
+			if(projectilePool[i].isActive){
+				projectilePool[i].timer += timeStep / 10;				
+				
+				projectilePool[i].sprite.position.x += projectilePool[i].velocity.x; 
+				projectilePool[i].sprite.position.y += projectilePool[i].velocity.y; 
+				
+				if(projectilePool[i].timer > projectilePool[i].lifeTimer){
+					projectilePool[i].timer = 0;
+					projectilePool[i].isActive = false;
+					projectilePool[i].sprite.renderable = false;
+				}
+
+				for (var j = 0; j < listOfSpawnedAsteroids.length; j++) 
+				{
+					if(b.hit(projectilePool[i].sprite, listOfSpawnedAsteroids[j].Sprite))
+					{
+						projectilePool[i].timer = 0;
+						projectilePool[i].isActive = false;
+						projectilePool[i].sprite.renderable = false;
+
+						listOfSpawnedAsteroids[j].damageMe(100);
+					}
+				}
+			}
+		}			
+	}
+
 	function poolObj(){
 			var spriteName = 'Projectile.png';
-
 			
 			this.isActive = false;
 			
